@@ -31,6 +31,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
+import ChannelList from '@components/ChannelList';
+import DMList from '@components/DMList';
 
 const Workspace: VFC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -39,12 +41,14 @@ const Workspace: VFC = () => {
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
-  const [showInviteMemberModal, setShowInviteMemberModal] = useState(false);
+  const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] = useState(false);
   const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
 
   const { workspace } = useParams();
   const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
+  const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
+
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null).then(() => {
       mutate();
@@ -87,17 +91,17 @@ const Workspace: VFC = () => {
   const onCloseModal = useCallback(() => {
     setShowCreateWorkspaceModal(false);
     setShowCreateChannelModal(false);
-    setShowInviteMemberModal(false);
+    setShowInviteWorkspaceModal(false);
     setShowInviteChannelModal(false);
   }, []);
   const toggleWorkspaceModal = useCallback(() => {
     setShowWorkspaceModal((prev) => !prev);
   }, []);
   const onClickAddChannel = useCallback(() => {
-    setShowCreateChannelModal((prev) => !prev);
+    setShowCreateChannelModal(true);
   }, []);
   const onClickInviteWorkspace = useCallback(() => {
-    setShowInviteMemberModal((prev) => !prev);
+    setShowInviteWorkspaceModal(true);
   }, []);
 
   if (!userData) {
@@ -156,9 +160,8 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>logout</button>
               </WorkspaceModal>
             </Menu>
-            {channelData?.map((channel) => (
-              <div>{channel.name}</div>
-            ))}
+            <ChannelList />
+            <DMList />
           </MenuScroll>
         </Channels>
         <Chats>
@@ -184,9 +187,9 @@ const Workspace: VFC = () => {
         setShowCreateChannelModal={setShowCreateChannelModal}
       />
       <InviteWorkspaceModal
-        show={showInviteMemberModal}
+        show={showInviteWorkspaceModal}
         onCloseModal={onCloseModal}
-        setShowInviteMemberModal={setShowInviteMemberModal}
+        setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
       />
       <InviteChannelModal
         show={showInviteChannelModal}

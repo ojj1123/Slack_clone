@@ -12,9 +12,9 @@ import useSWR from 'swr';
 interface Props {
   show: boolean;
   onCloseModal: () => void;
-  setShowInviteMemberModal: (flag: boolean) => void;
+  setShowInviteWorkspaceModal: (flag: boolean) => void;
 }
-const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteMemberModal }) => {
+const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteWorkspaceModal }) => {
   const [newMember, onChangeNewMember, setNewMember] = useInput('');
   const { workspace } = useParams();
 
@@ -32,7 +32,7 @@ const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteMem
         .post(`/api/workspaces/${workspace}/members`, { email: newMember })
         .then(() => {
           setNewMember('');
-          setShowInviteMemberModal(false);
+          setShowInviteWorkspaceModal(false);
           mutateMember();
         })
         .catch(() => {
