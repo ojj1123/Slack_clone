@@ -47,13 +47,13 @@ const Signup = () => {
             setSignupSuccess(true);
           })
           .catch((error) => {
-            console.log(error.response);
+            console.dir(error.response);
             setSignupError(true);
           })
           .finally(() => {});
       }
     },
-    [email, nickname, password, passwordCheck],
+    [email, nickname, password, mismatchError],
   );
 
   if (data) {

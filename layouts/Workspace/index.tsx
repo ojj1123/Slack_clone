@@ -1,6 +1,6 @@
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { VFC, useCallback, useState } from 'react';
+import React, { VFC, useCallback, useState, useEffect } from 'react';
 import { Navigate, Outlet, useParams } from 'react-router';
 import useSWR from 'swr';
 import {
@@ -26,13 +26,14 @@ import CreateChannelModal from '@components/CreateChannelModal';
 import { Link } from 'react-router-dom';
 import { IChannel, IUser } from '@typings/db';
 import { Button, Input, Label } from '@pages/Signup/styles';
-import useInput from '@hooks/useInput';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
 import ChannelList from '@components/ChannelList';
 import DMList from '@components/DMList';
+import useInput from '@hooks/useInput';
+import useSocket from '@hooks/useSocket';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Workspace: VFC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -48,12 +49,26 @@ const Workspace: VFC = () => {
   const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
+  const [socket, disconnect] = useSocket(workspace);
+
+  useEffect(() => {
+    if (channelData && userData && socket) {
+      console.log(socket);
+      socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
+    }
+  }, [channelData, userData, socket]);
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [workspace, disconnect]);
 
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null).then(() => {
       mutate();
     });
   }, []);
+
   const onClickUserProfile = useCallback((e) => {
     e.stopPropagation();
     setShowUserMenu((prev) => !prev);
@@ -143,7 +158,7 @@ const Workspace: VFC = () => {
       <WorkspaceWrapper>
         <Workspaces>
           {userData?.Workspaces.map((ws) => (
-            <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>
+            <Link key={ws.id} to={`/workspace/${ws.url}/channel/일반`}>
               <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>
             </Link>
           ))}

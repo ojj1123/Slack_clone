@@ -1,9 +1,9 @@
 import EachDM from '@components/EachDM';
+import useSocket from '@hooks/useSocket';
 import { IDM, IUser } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import React, { useCallback, useEffect, useState, VFC } from 'react';
 import { useParams } from 'react-router';
-import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 import { CollapseButton } from './styles';
 
@@ -21,6 +21,8 @@ const DMList: VFC = () => {
   const [channelCollapse, setChannelCollapse] = useState(false);
   const [countList, setCountList] = useState<{ [key: string]: number }>({});
   const [onlineList, setOnlineList] = useState<number[]>([]);
+
+  const [socket] = useSocket(workspace);
 
   const toggleChannelCollapse = useCallback(() => {
     setChannelCollapse((prev) => !prev);
@@ -40,6 +42,19 @@ const DMList: VFC = () => {
     setOnlineList([]);
     setCountList({});
   }, [workspace]);
+
+  useEffect(() => {
+    socket?.on('onlineList', (data: number[]) => {
+      setOnlineList(data);
+    });
+    // socket?.on('dm', onMessage);
+    // console.log('socket on dm', socket?.hasListeners('dm'), socket);
+    return () => {
+      // socket?.off('dm', onMessage);
+      // console.log('socket off dm', socket?.hasListeners('dm'));
+      socket?.off('onlineList');
+    };
+  }, [socket]);
 
   return (
     <>

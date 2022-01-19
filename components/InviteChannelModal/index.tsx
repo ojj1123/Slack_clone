@@ -47,7 +47,7 @@ const InviteChannelModal: VFC<Props> = ({ show, onCloseModal, setShowInviteChann
           });
         });
     },
-    [workspace, newMember],
+    [workspace, channel, newMember],
   );
 
   return (

@@ -24,7 +24,7 @@ const Login = () => {
           setLogInError(error.response?.data?.code === 401);
         });
     },
-    [email, password],
+    [email, password, mutate],
   );
 
   if (data) {
@@ -43,7 +43,14 @@ const Login = () => {
         <Label id="password-label">
           <span>비밀번호</span>
           <div>
-            <Input type="password" id="password" name="password" value={password} onChange={onChangePassword} />
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={onChangePassword}
+              autoComplete="off"
+            />
           </div>
           {logInError && <Error>이메일과 비밀번호 조합이 일치하지 않습니다.</Error>}
         </Label>
