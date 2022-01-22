@@ -53,7 +53,6 @@ const Workspace: VFC = () => {
 
   useEffect(() => {
     if (channelData && userData && socket) {
-      console.log(socket);
       socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
     }
   }, [channelData, userData, socket]);
@@ -128,21 +127,21 @@ const Workspace: VFC = () => {
         <RightMenu>
           <span onClick={onClickUserProfile}>
             <ProfileImg
-              src={gravatar.url(userData.nickname, {
+              src={gravatar.url(userData.email, {
                 s: '28px',
                 d: 'retro',
               })}
-              alt={userData.nickname}
+              alt={userData.email}
             />
             {showUserMenu && (
               <Menu style={{ right: 0, top: 38 }} show={showUserMenu} onCloseModal={onClickUserProfile}>
                 <ProfileModal>
                   <img
-                    src={gravatar.url(userData.nickname, {
+                    src={gravatar.url(userData.email, {
                       s: '36px',
                       d: 'retro',
                     })}
-                    alt={userData.nickname}
+                    alt={userData.email}
                   />
                   <div>
                     <span id="profile-name">{userData.nickname}</span>

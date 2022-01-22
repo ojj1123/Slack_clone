@@ -35,7 +35,7 @@ const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteWor
           setShowInviteWorkspaceModal(false);
           mutateMember();
         })
-        .catch(() => {
+        .catch((error) => {
           console.dir(error);
           toast.error(error.response?.data, {
             autoClose: 5000,

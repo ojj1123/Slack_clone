@@ -35,7 +35,7 @@ const InviteChannelModal: VFC<Props> = ({ show, onCloseModal, setShowInviteChann
           setShowInviteChannelModal(false);
           mutateMember();
         })
-        .catch(() => {
+        .catch((error) => {
           console.dir(error);
           toast.error(error.response?.data, {
             autoClose: 5000,

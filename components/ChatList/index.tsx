@@ -1,24 +1,46 @@
 import Chat from '@components/Chat';
-import { IDM } from '@typings/db';
-import React, { useCallback, useRef, VFC } from 'react';
+import { IChat, IDM } from '@typings/db';
+import React, { ForwardedRef, forwardRef, MutableRefObject, useCallback } from 'react';
 import Scrollbars from 'react-custom-scrollbars';
-import { ChatZone } from './styles';
+import { ChatZone, Section, StickyHeader } from './styles';
 
 interface Props {
-  chatData?: IDM[];
+  chatSections: { [key: string]: (IDM | IChat)[] };
+  setSize: (f: (index: number) => number) => Promise<(IDM | IChat)[][] | undefined>;
+  isReachingEnd: boolean;
 }
-const ChatList: VFC<Props> = ({ chatData }) => {
-  const scrollbarRef = useRef(null);
-  const onScroll = useCallback(() => {}, []);
-  return (
-    <ChatZone>
-      <Scrollbars autoHide ref={scrollbarRef} onScrollFrame={onScroll}>
-        {chatData?.map((chat) => (
-          <Chat key={chat.id} data={chat} />
-        ))}
-      </Scrollbars>
-    </ChatZone>
-  );
-};
+const ChatList = forwardRef<Scrollbars, Props>(
+  ({ chatSections, setSize, isReachingEnd }, scrollbarRef: ForwardedRef<Scrollbars>) => {
+    const onScroll = useCallback(
+      (values) => {
+        if (values.scrollTop === 0 && !isReachingEnd) {
+          setSize((prevSize) => prevSize + 1).then(() => {
+            const current = (scrollbarRef as MutableRefObject<Scrollbars>)?.current;
+            if (current) current.scrollTop(current.getScrollHeight() - values.scrollHeight);
+          });
+        }
+      },
+      [setSize, isReachingEnd],
+    );
+    return (
+      <ChatZone>
+        <Scrollbars autoHide ref={scrollbarRef} onScrollFrame={onScroll}>
+          {Object.entries(chatSections).map(([date, chats]) => {
+            return (
+              <Section className={`section-${date}`} key={date}>
+                <StickyHeader>
+                  <button>{date}</button>
+                </StickyHeader>
+                {chats.map((chat) => (
+                  <Chat key={chat.id} data={chat} />
+                ))}
+              </Section>
+            );
+          })}
+        </Scrollbars>
+      </ChatZone>
+    );
+  },
+);
 
 export default ChatList;
