@@ -18,11 +18,10 @@ const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat, placeholder }) 
   const { workspace } = useParams();
   const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    if (textareaRef.current) {
-      autosize(textareaRef.current);
+  const textareaRef = useCallback((element: HTMLTextAreaElement) => {
+    if (element !== null) {
+      autosize(element);
+      element.focus();
     }
   }, []);
   const onKeyDownChat = useCallback(

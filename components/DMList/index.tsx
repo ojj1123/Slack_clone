@@ -19,7 +19,6 @@ const DMList: VFC = () => {
 
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
   const [channelCollapse, setChannelCollapse] = useState(false);
-  const [countList, setCountList] = useState<{ [key: string]: number }>({});
   const [onlineList, setOnlineList] = useState<number[]>([]);
 
   const [socket] = useSocket(workspace);
@@ -27,31 +26,17 @@ const DMList: VFC = () => {
   const toggleChannelCollapse = useCallback(() => {
     setChannelCollapse((prev) => !prev);
   }, []);
-  const resetCount = useCallback((id) => {
-    setCountList((list) => ({ ...list, [id]: 0 }));
-  }, []);
-  const onMessage = (data: IDM) => {
-    console.log('dm옴', data);
-    setCountList((list) => ({
-      ...list,
-      [data.SenderId]: list[data.SenderId] ? list[data.SenderId] + 1 : 1,
-    }));
-  };
+
   useEffect(() => {
     console.log('DMList: workspace 바뀜', workspace);
     setOnlineList([]);
-    setCountList({});
   }, [workspace]);
 
   useEffect(() => {
     socket?.on('onlineList', (data: number[]) => {
       setOnlineList(data);
     });
-    // socket?.on('dm', onMessage);
-    // console.log('socket on dm', socket?.hasListeners('dm'), socket);
     return () => {
-      // socket?.off('dm', onMessage);
-      // console.log('socket off dm', socket?.hasListeners('dm'));
       socket?.off('onlineList');
     };
   }, [socket]);
@@ -72,7 +57,6 @@ const DMList: VFC = () => {
         {!channelCollapse &&
           memberData?.map((member) => {
             const isOnline = onlineList.includes(member.id);
-            const count = countList[member.id] || 0;
             return <EachDM key={member.id} member={member} isOnline={isOnline} />;
           })}
       </div>

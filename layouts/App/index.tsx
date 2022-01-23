@@ -21,6 +21,7 @@ const App = () => {
         <Route path="channel/:channel" element={<Channel />} />
         <Route path="dm/:id" element={<DirectMessage />} />
       </Route>
+      <Route path="*" element={<div>Not Found.</div>} />
     </Routes>
   );
 };

@@ -17,13 +17,9 @@ const ChannelList: VFC = () => {
   });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const [channelCollapse, setChannelCollapse] = useState(false);
-  const [countList, setCountList] = useState<{ [key: string]: number | undefined }>({});
 
   const toggleChannelCollapse = useCallback(() => {
     setChannelCollapse((prev) => !prev);
-  }, []);
-  const resetCount = useCallback((id) => {
-    setCountList((list) => ({ ...list, [id]: 0 }));
   }, []);
   return (
     <>

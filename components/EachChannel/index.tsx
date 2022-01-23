@@ -19,11 +19,11 @@ const EachChannel: VFC<Props> = ({ channel }) => {
     userData ? `/api/workspaces/${workspace}/channels/${channel.name}/unreads?after=${date}` : null,
     fetcher,
   );
-  // useEffect(() => {
-  //   if (location.pathname === `/workspace/${workspace}/channel/${channel.name}`) {
-  //     mutate(0);
-  //   }
-  // }, [mutate, location.pathname, workspace, channel]);
+  useEffect(() => {
+    if (location.pathname === `/workspace/${workspace}/channel/${channel.name}`) {
+      mutate(0);
+    }
+  }, [mutate, location.pathname, workspace, channel]);
 
   return (
     <NavLink
